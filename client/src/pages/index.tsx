@@ -2,13 +2,16 @@ import SlotMachine from "@/components/SlotMachine";
 
 export default function Home() {
   return (
-    <div
-      className={`font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20`}
-    >
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <h1>Hello World, Slot Machine DApp</h1>
+    <div className="min-h-screen bg-gradient-to-b from-slate-900 to-black text-white flex flex-col items-center gap-6 py-8">
+      <h1 className="text-3xl font-bold">Pump.fun Slot Machine Live</h1>
+
+      <div className="flex justify-center">
         <SlotMachine />
-      </main>
+      </div>
+
+      <p className="text-xs text-white/60">
+        *Jackpot interval adapts as market cap grows. Payout suggestion = 50% of creator wallet (manual send).
+      </p>
     </div>
   );
 }
