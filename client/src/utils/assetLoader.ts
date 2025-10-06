@@ -1,18 +1,26 @@
 import { Assets } from 'pixi.js';
+import doge from '@/assets/doge.png';
+import meme from '@/assets/meme.png';
+import pepe from '@/assets/pepe.png';
+import mask from '@/assets/mask.png';
+import smoke from '@/assets/smoke.png';
+import coin from '@/assets/coin.png';
+import text from '@/assets/text.png';
+import winner from '@/assets/winner.png';
 
 // Cache for loaded textures
 const textureCache = new Map<string, unknown>();
 
 export const preloadAssets = async () => {
-  const assetPaths = [
-    '/assets/doge.png',
-    '/assets/meme.png', 
-    '/assets/pepe.png',
-    '/assets/mask.png',
-    '/assets/smoke.png',
-    '/assets/coin.png',
-    '/assets/text.png',
-    '/assets/winner.png'
+  const assets = [
+    { key: 'doge', src: doge.src },
+    { key: 'meme', src: meme.src },
+    { key: 'pepe', src: pepe.src },
+    { key: 'mask', src: mask.src },
+    { key: 'smoke', src: smoke.src },
+    { key: 'coin', src: coin.src },
+    { key: 'text', src: text.src },
+    { key: 'winner', src: winner.src },
   ];
 
   try {
@@ -21,8 +29,8 @@ export const preloadAssets = async () => {
       bundles: [
         {
           name: 'default',
-          assets: assetPaths.reduce((acc, path) => {
-            acc[path] = { alias: path, src: path };
+          assets: assets.reduce((acc, a) => {
+            acc[a.key] = { alias: a.key, src: a.src };
             return acc;
           }, {} as Record<string, { alias: string; src: string }>)
         }
@@ -32,12 +40,12 @@ export const preloadAssets = async () => {
     await Assets.init({ manifest });
 
     // Preload all assets
-    const promises = assetPaths.map(async (path) => {
-      if (!textureCache.has(path)) {
-        const texture = await Assets.load(path);
-        textureCache.set(path, texture);
+    const promises = assets.map(async (a) => {
+      if (!textureCache.has(a.key)) {
+        const texture = await Assets.load(a.src);
+        textureCache.set(a.key, texture);
       }
-      return textureCache.get(path);
+      return textureCache.get(a.key);
     });
 
     await Promise.all(promises);
@@ -47,8 +55,8 @@ export const preloadAssets = async () => {
   }
 };
 
-export const getTexture = (path: string) => {
-  return textureCache.get(path);
+export const getTexture = (key: string) => {
+  return textureCache.get(key);
 };
 
 export const clearTextureCache = () => {

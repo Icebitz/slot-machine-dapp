@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { Application, Assets, Container, Text, TextStyle, Sprite, BlurFilter } from "pixi.js";
+import { Application, Assets, Container, Text, TextStyle, Sprite, BlurFilter, Ticker } from "pixi.js";
 import flame from "@/assets/smoke.png";
 import { FIRST_COLOR, LAST_COLOR, SECOND_COLOR, THIRD_COLOR } from "@/utils/const";
 
@@ -125,26 +125,42 @@ export default function TokenFlame() {
       glow.y = height / 2;
       glow.scale.set(1, 1.1);
 
-      const blur = new BlurFilter({ strength: 0, quality: 4, resolution: 2 });
-      glow.filters = [blur];
+      // Disable filters on Text to avoid Pixi v8 Batcher errors in dev.
+      // We'll emulate a glow via alpha + scale pulsing instead.
+      glow.filters = null;
 
       app.stage.addChild(text);
       app.stage.addChild(glow);
 
       let tAccum = 0;
-      const minStrength = 0;
-      const maxStrength = 8;
       const minAlpha = 0.15;
       const maxAlpha = 0.85;
       const pulseSpeed = 0.0002;
 
-      app.ticker.add((ticker) => {
-        tAccum += ticker.deltaMS * pulseSpeed;
-        const phase = (Math.sin(tAccum * Math.PI * 2) + 1) / 2;
-        const smooth = phase * phase * (3 - 2 * phase);
-        blur.strength = minStrength + smooth * (maxStrength - minStrength);
-        glow.alpha = minAlpha + smooth * (maxAlpha - minAlpha);
-      });
+      // Separate ticker for text animation to avoid conflicts
+      const textTicker = (ticker: Ticker) => {
+        if (destroyed) return;
+        
+        try {
+          tAccum += ticker.deltaMS * pulseSpeed;
+          const phase = (Math.sin(tAccum * Math.PI * 2) + 1) / 2;
+          const smooth = phase * phase * (3 - 2 * phase);
+          
+          // Update glow alpha (this always works)
+          if (glow && typeof glow.alpha !== 'undefined') {
+            glow.alpha = minAlpha + smooth * (maxAlpha - minAlpha);
+          }
+          // Use scale for a subtle pulsing effect
+          if (glow && typeof glow.scale !== 'undefined') {
+            const scaleFactor = 1 + (smooth * 0.01);
+            glow.scale.set(scaleFactor, scaleFactor * 1.1);
+          }
+        } catch (error) {
+          console.warn('Error updating text animation:', error);
+        }
+      };
+
+      app.ticker.add(textTicker);
     }
 
     init();
@@ -155,11 +171,22 @@ export default function TokenFlame() {
       mountedRef.current = false;
       if (appRef.current) {
         try {
+          // Stop all tickers first
           appRef.current.ticker.stop();
+          
+          // Remove all children and their filters
           appRef.current.stage.removeChildren();
-          appRef.current.destroy(true, { children: true, texture: true });
-        } catch {}
-        appRef.current = null;
+          
+          // Destroy the application with proper cleanup
+          appRef.current.destroy(true, { 
+            children: true, 
+            texture: true
+          });
+        } catch (error) {
+          console.warn('Error during cleanup:', error);
+        } finally {
+          appRef.current = null;
+        }
       }
     };
   }, []);
