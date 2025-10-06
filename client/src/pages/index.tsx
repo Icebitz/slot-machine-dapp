@@ -1,3 +1,5 @@
+import SlotMachine from "@/components/SlotMachine";
+
 export default function Home() {
   return (
     <div
@@ -5,6 +7,7 @@ export default function Home() {
     >
       <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
         <h1>Hello World, Slot Machine DApp</h1>
+        <SlotMachine />
       </main>
     </div>
   );
