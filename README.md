@@ -8,11 +8,11 @@ This dApp provides a fun and engaging slot machine experience where players can 
 
 ## Features
 
-- 🎰 Classic 3-reel slot machine gameplay
+- 🎰 Classic 5-reel slot machine gameplay
 - 💰 Support for pump.fun token integration
 - 🔒 Decentralized and secure blockchain transactions
 - 📱 Responsive web interface
-- ⚡ Fast and smooth user experience
+- ⚡️ Fast and smooth user experience
 
 ## Tech Stack
 

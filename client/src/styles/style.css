@@ -1,0 +1,31 @@
+@keyframes zoomOutFade {
+  from { transform: scale(1); opacity: 1; }
+  to   { transform: scale(0); opacity: 0; }
+}
+
+.logo-origin {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.logo-play {
+  animation: zoomOutFade var(--zof-dur, 400ms) var(--zof-ease, ease) both;
+  transform-origin: center;
+  will-change: transform, opacity;
+}
+
+@keyframes shrinkToOrigin {
+  from { transform: scale(2); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
+
+.win-origin {
+  opacity: 0;
+  transform: scale(2);
+}
+
+.win-play {
+  animation: shrinkToOrigin var(--sto-dur, 400ms) var(--sto-ease, ease) both;
+  transform-origin: center;
+  will-change: transform, opacity;
+}
